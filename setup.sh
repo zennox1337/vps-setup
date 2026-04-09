@@ -257,7 +257,24 @@ cat > "${DEPLOY_DIR}/xray/config.json" <<EOF
       { "type": "field", "outboundTag": "dns-out", "network": "udp", "port": 53 },
       { "type": "field", "outboundTag": "block", "protocol": ["bittorrent"] },
       { "type": "field", "outboundTag": "block", "ip": ["geoip:private"] },
-      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all"] }
+      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all"] },
+      { "type": "field", "outboundTag": "block", "domain": [
+          "domain:yandex-team.ru",
+          "domain:an.yandex.ru",
+          "domain:mc.yandex.ru",
+          "domain:ads.vk.com",
+          "domain:top-fwz1.mail.ru",
+          "domain:r.mail.ru",
+          "domain:smi2.ru",
+          "domain:begun.ru",
+          "domain:rutarget.ru",
+          "domain:soloway.ru",
+          "domain:adfox.ru",
+          "domain:adfox.net",
+          "domain:adx1.com",
+          "domain:relap.io",
+          "domain:segmento.ru"
+      ]}
     ]
   },
   "policy": {
@@ -282,6 +299,9 @@ cat > "${DEPLOY_DIR}/xray/config.json" <<EOF
 }
 EOF
 log "xray/config.json создан"
+curl -fsSL "https://github.com/runetfreedom/russia-v2ray-rules-dat/raw/release/geosite.dat" \
+  -o "${DEPLOY_DIR}/xray/geosite.dat"
+log "Кастомный geosite.dat (с российскими доменами) загружен"
 
 # ═══════════════════════════════════════════════
 #  PROMETHEUS CONFIG
@@ -835,6 +855,10 @@ Public key:  ${PUBLIC_KEY}
 Private key: ${PRIVATE_KEY}
 Short ID 1:  ${SHORT_ID1}
 Short ID 2:  ${SHORT_ID2}
+
+─── VLESS ССЫЛКИ ────────────────────────────────
+user1: vless://${UUID1}@${SERVER_IP}:443?encryption=none&security=reality&sni=www.microsoft.com&fp=chrome&pbk=${PUBLIC_KEY}&sid=${SHORT_ID1}&type=xhttp&path=%2Fapi%2Fv1%2Fdata&mode=auto#user1
+user2: vless://${UUID2}@${SERVER_IP}:443?encryption=none&security=reality&sni=www.microsoft.com&fp=chrome&pbk=${PUBLIC_KEY}&sid=${SHORT_ID2}&type=xhttp&path=%2Fapi%2Fv1%2Fdata&mode=auto#user2
 
 ─── MTPROXY (telemt) ────────────────────────────
 Port:        4430
