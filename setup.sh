@@ -16,7 +16,12 @@ NC='\033[0m'
 
 DEPLOY_DIR="/home/deploy"
 XRAY_VERSION="26.1.23"
-XRAY_IMAGE="ghcr.io/xtls/xray-core:${XRAY_VERSION}"
+ARCH=$(uname -m)
+if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+  XRAY_IMAGE="ghcr.io/xtls/xray-core:latest"
+else
+  XRAY_IMAGE="ghcr.io/xtls/xray-core:${XRAY_VERSION}"
+fi
 MTPROXY_SECRET=""  # будет заполнено если найден telemt
 
 log()     { echo -e "${GREEN}[+]${NC} $1"; }
