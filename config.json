@@ -47,35 +47,11 @@
         }
       },
       "sniffing": {
-        "enabled": true,
-        "destOverride": [
-          "http",
-          "tls",
-          "quic"
-        ],
+        "enabled": false,
         "routeOnly": true
       }
     }
   ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
-    "rules": [
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "domain": [
-          "geosite:private"
-        ]
-      }
-    ]
-  },
   "outbounds": [
     {
       "protocol": "freedom",
@@ -87,15 +63,6 @@
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true
-        }
-      }
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "block",
-      "settings": {
-        "response": {
-          "type": "http"
         }
       }
     }
