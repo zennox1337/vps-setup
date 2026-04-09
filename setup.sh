@@ -17,11 +17,7 @@ NC='\033[0m'
 DEPLOY_DIR="/home/deploy"
 XRAY_VERSION="26.1.23"
 ARCH=$(uname -m)
-if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-  XRAY_IMAGE="ghcr.io/xtls/xray-core:latest"
-else
-  XRAY_IMAGE="ghcr.io/xtls/xray-core:${XRAY_VERSION}"
-fi
+XRAY_IMAGE="ghcr.io/xtls/xray-core:latest"
 MTPROXY_SECRET=""  # будет заполнено если найден telemt
 
 log()     { echo -e "${GREEN}[+]${NC} $1"; }
@@ -166,7 +162,7 @@ docker pull -q "${XRAY_IMAGE}"
 
 XRAY_KEYS=$(docker run --rm "${XRAY_IMAGE}" x25519)
 PRIVATE_KEY=$(echo "$XRAY_KEYS" | grep -i "privatekey\|private key" | awk '{print $NF}')
-PUBLIC_KEY=$(echo "$XRAY_KEYS"  | grep -i "password\|public key"   | awk '{print $NF}')
+PUBLIC_KEY=$(echo "$XRAY_KEYS"  | grep -i "password\|public key"    | awk '{print $NF}')
 
 [ -z "$PRIVATE_KEY" ] && error "Не удалось сгенерировать приватный ключ Xray"
 [ -z "$PUBLIC_KEY"  ] && error "Не удалось сгенерировать публичный ключ Xray"
@@ -323,7 +319,7 @@ cat > "${DEPLOY_DIR}/docker-compose.yml" <<EOF
 services:
 
   xray:
-    image: ghcr.io/xtls/xray-core:${XRAY_VERSION}
+    image: ghcr.io/xtls/xray-core:latest
     container_name: xray
     restart: unless-stopped
     user: "65532"
