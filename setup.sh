@@ -512,7 +512,7 @@ sed -i 's/^#\?LoginGraceTime.*/LoginGraceTime 20/'  "${SSH_CONFIG}"
 sed -i 's/^#\?X11Forwarding.*/X11Forwarding no/'    "${SSH_CONFIG}"
 sed -i 's/^#\?AllowAgentForwarding.*/AllowAgentForwarding no/' "${SSH_CONFIG}"
 
-systemctl reload sshd
+systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null || true
 log "SSH hardening применён"
 
 # Убираем временное правило старого порта
