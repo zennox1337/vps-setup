@@ -45,7 +45,7 @@ log "Xray $(xray version | head -1 | awk '{print $2}')"
 section "Генерация ключей"
 NEW_UUID=$(xray uuid)
 KEYPAIR=$(xray x25519)
-NEW_PRIV=$(echo "$KEYPAIR" | awk '/PrivateKey:/         {print $NF}')
+NEW_PRIV=$(echo "$KEYPAIR" | awk '/PrivateKey:/             {print $NF}')
 NEW_PUB=$(echo  "$KEYPAIR" | awk '/Password \(PublicKey\):/ {print $NF}')
 NEW_SID=$(openssl rand -hex 4)   # 8 символов, как твой первый
 log "UUID и ключевая пара сгенерированы"
