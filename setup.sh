@@ -323,7 +323,7 @@ services:
     user: "65532"
     command: ["-confdir", "/usr/local/etc/xray/"]
     ports:
-      - "0.0.0.0:8443:8443"
+      - "127.0.0.1:8443:8443"
       - "127.0.0.1:10085:10085"
     volumes:
       - ./xray:/usr/local/etc/xray
@@ -469,6 +469,55 @@ EOF
 fi
 
 # ═══════════════════════════════════════════════
+#  NGINX (TCP stream proxy)
+# ═══════════════════════════════════════════════
+section "Nginx (stream proxy)"
+apt-get install -y -qq nginx libnginx-mod-stream > /dev/null
+
+cat > /etc/nginx/nginx.conf <<'EOF'
+load_module /usr/lib/nginx/modules/ngx_stream_module.so;
+
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+stream {
+    include /etc/nginx/stream.conf;
+}
+EOF
+
+cat > /etc/nginx/stream.conf <<'EOF'
+map $ssl_preread_server_name $backend {
+    www.microsoft.com   127.0.0.1:8443;
+    microsoft.com       127.0.0.1:8443;
+    default             127.0.0.1:4430;
+}
+
+server {
+    listen 443 reuseport;
+    listen [::]:443 reuseport;
+    proxy_pass $backend;
+    ssl_preread on;
+    proxy_connect_timeout 5s;
+    proxy_timeout 600s;
+    proxy_buffer_size 32k;
+    proxy_socket_keepalive on;
+    access_log off;
+    error_log /var/log/nginx/stream_error.log warn;
+}
+EOF
+
+# Отключаем дефолтный сайт
+rm -f /etc/nginx/sites-enabled/default
+
+nginx -t && systemctl enable --now nginx
+log "Nginx настроен (stream proxy на порту 443)"
+
+# ═══════════════════════════════════════════════
 #  FIREWALL (UFW)
 # ═══════════════════════════════════════════════
 section "Firewall (ufw)"
@@ -487,12 +536,7 @@ fi
 ufw allow "${TARGET_SSH_PORT}/tcp" comment "SSH" > /dev/null
 
 # Xray — публичный порт
-ufw allow 8443/tcp comment "Xray VLESS" > /dev/null
-
-# MTProxy — только если telemt установлен
-if command -v telemt &>/dev/null; then
-  ufw allow 4430/tcp comment "MTProxy" > /dev/null
-fi
+ufw allow 443/tcp comment "Nginx stream (Xray+MTProxy)" > /dev/null
 
 # Мониторинг — только локально (через Tailscale)
 ufw deny 3000  > /dev/null
