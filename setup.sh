@@ -15,8 +15,6 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 DEPLOY_DIR="/home/deploy"
-XRAY_VERSION="26.1.23"
-ARCH=$(uname -m)
 XRAY_IMAGE="ghcr.io/xtls/xray-core:latest"
 MTPROXY_SECRET=""  # будет заполнено если найден telemt
 
