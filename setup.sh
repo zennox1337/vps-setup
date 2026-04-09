@@ -164,9 +164,9 @@ section "Генерация ключей Xray"
 # Тянем образ заранее чтобы отделить pull от генерации
 docker pull -q "${XRAY_IMAGE}"
 
-XRAY_KEYS=$(docker run --rm "${XRAY_IMAGE}" xray x25519 2>/dev/null)
-PRIVATE_KEY=$(echo "$XRAY_KEYS" | grep "Private key:" | awk '{print $3}')
-PUBLIC_KEY=$(echo "$XRAY_KEYS"  | grep "Public key:"  | awk '{print $3}')
+XRAY_KEYS=$(docker run --rm "${XRAY_IMAGE}" x25519)
+PRIVATE_KEY=$(echo "$XRAY_KEYS" | grep -i "privatekey\|private key" | awk '{print $NF}')
+PUBLIC_KEY=$(echo "$XRAY_KEYS"  | grep -i "password\|public key"   | awk '{print $NF}')
 
 [ -z "$PRIVATE_KEY" ] && error "Не удалось сгенерировать приватный ключ Xray"
 [ -z "$PUBLIC_KEY"  ] && error "Не удалось сгенерировать публичный ключ Xray"
