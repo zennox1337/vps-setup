@@ -61,10 +61,6 @@ jq \
   "$CONFIG_SRC" > /usr/local/etc/xray/config.json
 log "config.json записан (ключи подставлены)"
 
-curl -fsSL "https://github.com/runetfreedom/russia-v2ray-rules-dat/raw/release/geosite.dat" \
-  -o /usr/local/share/xray/geosite.dat
-log "geosite.dat загружен"
-
 systemctl enable xray
 systemctl restart xray
 sleep 1
