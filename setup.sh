@@ -573,7 +573,7 @@ if ! command -v cscli &>/dev/null; then
   # Генерируем API ключ для bouncer вручную
   BOUNCER_KEY=$(cscli bouncers add crowdsec-firewall-bouncer -o raw 2>/dev/null || echo "")
   if [ -n "$BOUNCER_KEY" ]; then
-    sed -i "s/^api_key:.*/api_key: ${BOUNCER_KEY}/" \
+    sed -i "s|^api_key:.*|api_key: ${BOUNCER_KEY}|" \
       /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
     systemctl restart crowdsec-firewall-bouncer
     log "CrowdSec установлен и bouncer настроен"
