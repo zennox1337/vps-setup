@@ -393,10 +393,24 @@ log "docker-compose.yml создан"
 #  MTPROXY / TELEMT
 # ═══════════════════════════════════════════════
 section "MTProxy (telemt)"
+
+# Устанавливаем telemt если нет
+if ! command -v telemt &>/dev/null; then
+  TELEMT_URL="https://github.com/telemt/telemt/releases/latest/download/telemt-$(uname -m)-linux-gnu.tar.gz"
+  if curl -fsSL "$TELEMT_URL" | tar -xz -C /tmp/; then
+    mv /tmp/telemt /usr/local/bin/telemt
+    chmod +x /usr/local/bin/telemt
+    log "telemt установлен"
+  else
+    warn "Не удалось скачать telemt — MTProxy пропущен"
+    MTPROXY_SECRET="(telemt не установлен)"
+  fi
+fi
+
 if ! command -v telemt &>/dev/null; then
   warn "telemt не найден — пропускаем MTProxy"
   warn "Установи telemt вручную и перезапусти скрипт, или настрой сервис отдельно"
-  warn "Релизы: https://github.com/luckytea/telemt/releases"
+  warn "Релизы: https://github.com/telemt/telemt/releases"
   MTPROXY_SECRET="(telemt не установлен)"
 else
   MTPROXY_SECRET=$(openssl rand -hex 16)
@@ -841,7 +855,7 @@ echo -e "    2. Открой Grafana: http://<tailscale-ip>:3000"
 echo -e "    3. Импортируй дашборды: ID ${CYAN}23145${NC} (Xray) и ${CYAN}1860${NC} (Node)"
 if ! command -v telemt &>/dev/null; then
   echo -e "    4. ${YELLOW}Установи telemt для MTProxy${NC}"
-  echo -e "       https://github.com/luckytea/telemt/releases"
+  echo -e "       https://github.com/telemt/telemt/releases"
 fi
 echo ""
 echo -e "  📄 Все данные: ${BOLD}${SUMMARY_FILE}${NC}"
