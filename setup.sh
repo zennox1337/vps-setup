@@ -822,7 +822,7 @@ SERVER IP:   ${SERVER_IP}
 SSH PORT:    ${TARGET_SSH_PORT}
 
 ─── XRAY VLESS+REALITY ─────────────────────────
-Port:        8443
+Port:        443
 Path:        /api/v1/data
 SNI:         www.microsoft.com
 Network:     xhttp
@@ -839,7 +839,7 @@ Short ID 2:  ${SHORT_ID2}
 ─── MTPROXY (telemt) ────────────────────────────
 Port:        4430
 Secret:      ${MTPROXY_SECRET}
-Link:        tg://proxy?server=${SERVER_IP}&port=4430&secret=dd${MTPROXY_SECRET}
+Link:        tg://proxy?server=${SERVER_IP}&port=443&secret=dd${MTPROXY_SECRET}
 
 ─── GRAFANA ─────────────────────────────────────
 URL:         http://<tailscale-ip>:3000
@@ -885,7 +885,7 @@ echo -e "    Short ID:   ${SHORT_ID1}"
 echo ""
 if command -v telemt &>/dev/null; then
   echo -e "  ${BOLD}MTProxy:${NC}"
-  echo -e "    ${CYAN}tg://proxy?server=${SERVER_IP}&port=4430&secret=dd${MTPROXY_SECRET}${NC}"
+  echo -e "    ${CYAN}tg://proxy?server=${SERVER_IP}&port=443&secret=dd${MTPROXY_SECRET}${NC}"
   echo ""
 fi
 echo -e "  ${BOLD}Grafana:${NC}"
