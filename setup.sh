@@ -48,7 +48,12 @@ FallbackDNS=1.0.0.1 8.8.4.4
 EOF
   systemctl restart systemd-resolved
 fi
-timeout 5 getent ahostsv4 github.com > /dev/null || error "DNS не отвечает (getent github.com)"
+# Сразу после рестарта resolved первый запрос может не уложиться в таймаут — даём ~20 с
+for i in 1 2 3 4; do
+  timeout 5 getent ahostsv4 github.com > /dev/null && break
+  [ "$i" -eq 4 ] && error "DNS не отвечает (getent github.com)"
+  sleep 1
+done
 log "DNS: 1.1.1.1, 8.8.8.8"
 
 # ═══════════════════════════════════════════════
