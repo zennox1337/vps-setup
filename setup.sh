@@ -102,7 +102,11 @@ jq \
      .inbounds[0].streamSettings.realitySettings.serverNames = [$sni]
    else . end' \
   "$CONFIG_SRC" > /usr/local/etc/xray/config.json
-chmod 600 /usr/local/etc/xray/config.json
+# Xray работает от пользователя xray (если он есть) — даём читать группе, остальным нет
+if getent group xray > /dev/null; then
+  chown root:xray /usr/local/etc/xray/config.json
+  chmod 640 /usr/local/etc/xray/config.json
+fi
 log "config.json записан (ключи подставлены)"
 
 # Маскировка работает, только если dest отвечает TLS 1.3 + HTTP/2
