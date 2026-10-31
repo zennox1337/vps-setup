@@ -29,8 +29,11 @@ SNI="${SNI:-}"                  # сайт-маскировка; пусто — 
 FP="${FP:-firefox}"             # отпечаток TLS в ссылках (chrome режут чаще)
 TARGET_SSH_PORT="${SSH_PORT:-2222}"
 
-if ss -Htln 'sport = :443' | grep -q .; then
-  error "Порт 443 занят: $(ss -Htlnp 'sport = :443' | grep -o 'users:.*' | head -1). Удали старый XRay (Amnezia и т.п.)"
+# 443 может держать только наш xray.service (повторный запуск скрипта)
+PORT443=$(ss -Htlnp 'sport = :443')
+XRAY_PID=$(systemctl show -p MainPID --value xray 2>/dev/null || true)
+if [ -n "$PORT443" ] && ! { [ "${XRAY_PID:-0}" != 0 ] && grep -q "pid=${XRAY_PID}," <<< "$PORT443"; }; then
+  error "Порт 443 занят: $(grep -o 'users:.*' <<< "$PORT443" | head -1). Удали старый XRay (Amnezia и т.п.)"
 fi
 
 # ═══════════════════════════════════════════════
