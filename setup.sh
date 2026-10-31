@@ -128,7 +128,8 @@ systemctl is-active --quiet xray && log "Xray запущен" || error "Xray н�
 #  SSH HARDENING
 # ═══════════════════════════════════════════════
 section "SSH hardening"
-CURRENT_SSH_PORT=$(sshd -T 2>/dev/null | awk '/^port /{print $2; exit}')
+# awk дочитывает до конца: ранний exit даёт SIGPIPE у sshd и падение по pipefail
+CURRENT_SSH_PORT=$(sshd -T 2>/dev/null | awk '/^port / && !p {p = $2} END {print p}' || true)
 CURRENT_SSH_PORT=${CURRENT_SSH_PORT:-22}
 
 # Свой drop-in: sshd берёт первое значение, а sshd_config.d/*.conf читается раньше
@@ -163,7 +164,7 @@ else
   systemctl restart ssh 2>/dev/null || systemctl restart sshd
 fi
 sleep 1
-ss -Htln "sport = :${TARGET_SSH_PORT}" | grep -q . || error "SSH не слушает :${TARGET_SSH_PORT} — старый порт не закрываю"
+[ -n "$(ss -Htln "sport = :${TARGET_SSH_PORT}")" ] || error "SSH не слушает :${TARGET_SSH_PORT} — старый порт не закрываю"
 log "SSH порт → ${TARGET_SSH_PORT}"
 
 # ═══════════════════════════════════════════════
